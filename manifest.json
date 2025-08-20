@@ -5,8 +5,9 @@
   "description": "Cleans injected clipboard content on copy.",
   "applications": {
     "gecko": {
-      "id": "clipboardcleaner@lol.com"  // Replace with your unique ID
-    },
+      "id": "clipboardcleaner@lol.com"  
+    }
+  },
   "permissions": ["storage"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
