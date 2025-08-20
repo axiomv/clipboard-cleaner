@@ -1,9 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Clipboard Cleaner",
-  "version": "1.0",
-  "description": "Removes unwanted content added by websites during copy.",
-  "permissions": ["scripting", "activeTab"],
+  "version": "1.1",
+  "description": "Removes unwanted content added to the clipboard by websites.",
+  "permissions": ["storage"],
+  "options_page": "options.html",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "icons/icon128.png"
+    }
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
