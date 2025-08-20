@@ -6,7 +6,7 @@
   "applications": {
     "gecko": {
       "id": "clipboardcleaner@lol.com"  // Replace with your unique ID
-    }
+    },
   "permissions": ["storage"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
