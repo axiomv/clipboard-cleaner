@@ -1,0 +1,35 @@
+stages:
+  - build
+  - release
+
+build_xpi:
+  stage: build
+  image: zip:latest
+  script:
+    - mkdir -p build/firefox
+    - cp content.js build/firefox/
+    - cd build/firefox
+    - zip -r ../clipboard-cleaner.xpi .
+
+build_crx:
+  stage: build
+  image: zip:latest
+  script:
+    - mkdir -p build/chrome
+    - cp content.js build/chrome/
+    - cd build/chrome
+    - zip -r ../clipboard-cleaner.zip .
+    - echo "$PRIVATE_KEY" > private.pem
+    - npm install -g crx3
+    - crx3 ../clipboard-cleaner.zip --private-key=private.pem --output=../clipboard-cleaner.crx
+
+release:
+  stage: release
+  image: alpine:latest
+  script:
+    - echo "Creating release..."
+    - curl --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --data "name=Release $CI_COMMIT_TAG" --data "tag_name=$CI_COMMIT_TAG" --data "description=Release for $CI_COMMIT_TAG" "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/repository/tags"
+    - curl --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --upload-file build/clipboard-cleaner.xpi "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/generic/clipboard-cleaner/$CI_COMMIT_TAG/clipboard-cleaner.xpi"
+    - curl --header "PRIVATE-TOKEN: $GITLAB_TOKEN" --upload-file build/clipboard-cleaner.crx "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/generic/clipboard-cleaner/$CI_COMMIT_TAG/clipboard-cleaner.crx"
+  only:
+    - tags
