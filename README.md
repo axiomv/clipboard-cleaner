@@ -12,6 +12,10 @@ A browser extension that removes unwanted content injected into the clipboard by
 
 ## Installation
 
+### Firefox (AMO)
+
+You can also install Clipboard Cleaner from the Firefox Add-ons site: [Clipboard Cleaner on Firefox AMO](https://addons.mozilla.org/en-US/firefox/addon/clipboard-cleaner/).
+
 ### Chrome (Developer Mode)
 
 1. Clone or download this repository
@@ -39,10 +43,8 @@ Once installed:
 To modify or build the extension locally:
 
 ```
-bash
 git clone https://github.com/axiomv/clipboard-cleaner.git
 cd clipboard-cleaner
 ```
-
 ## License
 GPLv3
