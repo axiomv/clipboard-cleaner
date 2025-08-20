@@ -1,0 +1,21 @@
+document.addEventListener('copy', (e) => {
+  // Prevent the default copy behavior
+  e.preventDefault();
+
+  // Get current selection
+  const selection = window.getSelection();
+  if (!selection) return;
+
+  const text = selection.toString();
+
+  // Sanitize the text here (optional: trim, remove unwanted URLs etc.)
+  const cleanText = sanitizeCopiedText(text);
+
+  // Place clean text into the clipboard
+  e.clipboardData.setData('text/plain', cleanText);
+});
+
+function sanitizeCopiedText(text) {
+  // Example: strip tracking text (customize this as needed)
+  return text.replace(/(\n)?Copied from .*$/gi, '').trim();
+}

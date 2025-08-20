@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Clipboard Cleaner",
+  "version": "1.0",
+  "description": "Removes unwanted content added by websites during copy.",
+  "permissions": ["scripting", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
