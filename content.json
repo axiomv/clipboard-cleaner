@@ -1,43 +1,51 @@
+function sanitizeText(text, filters) {
+  let result = text;
+
+  // Apply keyword filters
+  if (filters.keywords && Array.isArray(filters.keywords)) {
+    filters.keywords.forEach(keyword => {
+      if (keyword.trim() !== "") {
+        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex chars
+        result = result.replace(new RegExp(escaped, 'gi'), '');
+      }
+    });
+  }
+
+  // Apply custom regex filters
+  if (filters.regex && Array.isArray(filters.regex)) {
+    filters.regex.forEach(pattern => {
+      try {
+        const regex = new RegExp(pattern, 'gi');
+        result = result.replace(regex, '');
+      } catch (e) {
+        console.warn('Invalid regex pattern:', pattern);
+      }
+    });
+  }
+
+  return result.trim();
+}
+
 document.addEventListener('copy', (e) => {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed) return;
 
   const text = selection.toString();
-  const cleanText = sanitizeText(text);
-
   const html = getSanitizedHTML(selection);
-  const cleanHtml = sanitizeHtml(html);
 
-  e.preventDefault();
-  e.clipboardData.setData('text/plain', cleanText);
-  e.clipboardData.setData('text/html', cleanHtml);
+  chrome.storage.sync.get(['keywords', 'regex'], (filters) => {
+    const cleanText = sanitizeText(text, filters);
+    const cleanHtml = sanitizeText(html, filters); // Same cleaning for HTML (or customize later)
+
+    e.preventDefault();
+    e.clipboardData.setData('text/plain', cleanText);
+    e.clipboardData.setData('text/html', cleanHtml);
+  });
 });
-
-function sanitizeText(text) {
-  // Strip tracking junk like "Copied from ..."
-  return text.replace(/(\n)?Copied from .*/gi, '').trim();
-}
 
 function getSanitizedHTML(selection) {
   const range = selection.getRangeAt(0);
   const container = document.createElement('div');
   container.appendChild(range.cloneContents());
   return container.innerHTML;
-}
-
-function sanitizeHtml(html) {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-
-  // Remove style/class attributes and certain tags
-  div.querySelectorAll('[style], [class], script, iframe').forEach(el => el.remove());
-
-  // Optional: remove all <a> tags
-  div.querySelectorAll('a').forEach(a => {
-    const span = document.createElement('span');
-    span.textContent = a.textContent;
-    a.replaceWith(span);
-  });
-
-  return div.innerHTML.trim();
 }
