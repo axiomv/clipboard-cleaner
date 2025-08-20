@@ -2,11 +2,8 @@ name: Build Extensions
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -28,16 +25,36 @@ jobs:
           mkdir -p build/chrome
           cp content.js build/chrome/
           cd build/chrome
-          zip -r ../clipboard-cleaner.zip .  # Change the name as needed
-          # Use crx3 to convert zip to crx
+          zip -r ../clipboard-cleaner.zip .
           echo "${{ secrets.PRIVATE_KEY }}" > private.pem
           npm install -g crx3
           crx3 ../clipboard-cleaner.zip --private-key=private.pem --output=../clipboard-cleaner.crx
 
-      - name: Upload XPI and CRX
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: extensions
           path: |
             build/clipboard-cleaner.xpi
             build/clipboard-cleaner.crx
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          files: |
+            build/clipboard-cleaner.xpi
+            build/clipboard-cleaner.crx
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
